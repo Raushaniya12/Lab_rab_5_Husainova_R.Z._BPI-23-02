@@ -1,0 +1,45 @@
+﻿<Window x:Class="Lab_rab_5_Husainova_R.Z._BPI_23_02.View.WindowEmployee"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel"
+        xmlns:local="clr-namespace:Lab_rab_5_Husainova_R.Z._BPI_23_02.View"
+        mc:Ignorable="d"
+        Title="Сотрудники" Height="450" Width="800"
+        DataContext="PersonViewModel.Instance">
+    <StackPanel>
+        <WrapPanel  HorizontalAlignment="Right">
+            <Button Content="☀️" Command="{Binding SwitchLightTheme}" Margin="5"/>
+            <Button Content=" 🌙" Command="{Binding SwitchDarkTheme}" Margin="5"/>
+        </WrapPanel>
+        <StackPanel Orientation="Horizontal"  Margin="5">
+            <Button Content="Добавить" Height="25" Margin="5" Command="{Binding AddPerson}"/>
+            <Button Content="Редактировать" Height="25" Margin="5" Command="{Binding EditPerson}"/>
+            <Button Content="Удалить" Height="25" Margin="5" Command="{Binding DeletePerson}"/>
+        </StackPanel>
+        <ListView ItemsSource="{Binding ListPersonDpo}" SelectedItem="{Binding SelectedPersonDpo}" Background="{DynamicResource WindowBackground}"
+Foreground="{DynamicResource WindowForeground}">
+            <ListView.View >
+                <GridView >
+                    <GridView.Columns >
+                        <GridViewColumn Header="Код" Width="50"
+                                        DisplayMemberBinding="{Binding Id}"/>
+                        <GridViewColumn Header="Фамилия"
+                                        DisplayMemberBinding="{Binding LastName}"/>
+                        <GridViewColumn Header="Имя"
+                                        DisplayMemberBinding="{Binding FirstName}"/>
+                        <GridViewColumn Header="Должность"
+                                        DisplayMemberBinding="{Binding RoleName}"/>
+                        <GridViewColumn Header="Дата рождения"
+                                        DisplayMemberBinding="{Binding Birthday,
+                            StringFormat={} {0:dd\.}{0:MM\.} {0:yyyy}}"/>
+
+                    </GridView.Columns>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+    </StackPanel>
+
+</Window>

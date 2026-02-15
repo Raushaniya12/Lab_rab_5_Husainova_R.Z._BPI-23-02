@@ -1,0 +1,48 @@
+﻿<Window x:Class="Lab_rab_5_Husainova_R.Z._BPI_23_02.View.WindowNewRole"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel"
+        xmlns:local="clr-namespace:Lab_rab_5_Husainova_R.Z._BPI_23_02.View"
+        mc:Ignorable="d"
+        Title="Новая должность" Height="220" Width="400" MinHeight="220" MinWidth="400">
+
+    <Grid Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <WrapPanel  Grid.Column="1" HorizontalAlignment="Right">
+            <Button Content="☀️" 
+Command="{Binding Source={x:Static vm:RoleViewModel.Instance}, Path=SwitchLightTheme}" 
+Margin="5"/>
+            <Button Content="🌙" 
+Command="{Binding Source={x:Static vm:RoleViewModel.Instance}, Path=SwitchDarkTheme}" 
+Margin="5"/>
+        </WrapPanel>
+        <Label Grid.Row="1" Grid.Column="0" Content="Код:" 
+               VerticalAlignment="Center" Margin="0,0,10,10"/>
+        <TextBox Grid.Row="1" Grid.Column="1" 
+                 Text="{Binding Id}" IsReadOnly="True"
+                 Margin="0,0,0,10"/>
+        <Label Grid.Row="2" Grid.Column="0" Content="Наименование:" 
+               VerticalAlignment="Center" Margin="0,0,10,10"/>
+        <TextBox Grid.Row="2" Grid.Column="1"
+                 Text="{Binding NameRole, UpdateSourceTrigger=PropertyChanged}"
+                 MaxLength="50" Margin="0,0,0,10"/>
+        <StackPanel Grid.Row="4" Grid.ColumnSpan="2" Orientation="Horizontal" 
+                    HorizontalAlignment="Right" Margin="0,15,0,0">
+            <Button Content="Сохранить" Width="80" Height="25" Margin="0,0,10,0"
+        Command="{Binding SaveCommand}" IsDefault="True"/>
+            <Button Content="Отмена" Width="80" Height="25"
+                    IsCancel="True"/>
+        </StackPanel>
+    </Grid>
+</Window>

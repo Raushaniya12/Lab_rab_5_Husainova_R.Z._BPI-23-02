@@ -1,0 +1,35 @@
+﻿<Window x:Class="Lab_rab_5_Husainova_R.Z._BPI_23_02.View.WindowRole"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Lab_rab_5_Husainova_R.Z._BPI_23_02.View"
+        mc:Ignorable="d"
+        Title="Должности" Height="350" Width="500">
+
+    <StackPanel>
+        <WrapPanel HorizontalAlignment="Right">
+            <Button  Content="☀️" Command="{Binding SwitchLightTheme}" Margin="5"/>
+            <Button  Content=" 🌙" Command="{Binding SwitchDarkTheme}" Margin="5"/>
+        </WrapPanel>
+        <Label Margin="5" HorizontalAlignment="Center">Список должностей сотрудников</Label>
+        <Button Content="Добавить" Height="25" Margin="10,10,5,10"
+Command="{Binding AddRole}"/>
+        <Button Content="Редактировать" Height="25" Margin="10,10,5,10"
+Command="{Binding EditRole}"/>
+        <Button Content="Удалить" Height="25" Margin="10,10,5,10" Command="{Binding DeleteRole}"/>
+        <ListView ItemsSource="{Binding ListRole}" SelectedItem="{Binding SelectedRole}">
+            <ListView.View >
+                <GridView>
+                    <GridView.Columns>
+                        <GridViewColumn Header="Код" Width="50"
+                                        DisplayMemberBinding="{Binding Id}"/>
+                        <GridViewColumn Header="Наименование должности"
+                                        DisplayMemberBinding="{Binding NameRole}"/>
+                    </GridView.Columns>
+                </GridView>
+            </ListView.View>
+        </ListView>
+    </StackPanel>
+</Window>
+
