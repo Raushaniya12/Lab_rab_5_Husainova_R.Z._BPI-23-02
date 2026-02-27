@@ -36,15 +36,6 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
             }
         }
         
-        
-        public RoleViewModel()
-        {
-            if (!System.ComponentModel.DesignerProperties
-        .GetIsInDesignMode(new System.Windows.DependencyObject()))
-            {
-                ListRole = LoadRole();
-            }
-        }
         private void RefreshRoleList()
         {
             OnPropertyChanged("ListRole");

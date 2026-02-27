@@ -1,21 +1,65 @@
 ﻿using Lab_rab_5_Husainova_R.Z._BPI_23_02.Helper;
 using Lab_rab_5_Husainova_R.Z._BPI_23_02.Model;
 using Lab_rab_5_Husainova_R.Z._BPI_23_02.View;
+using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Shapes;
+
 
 namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
 {
     public class PersonEditContext : INotifyPropertyChanged
     {
+        readonly string path = @"DataModels\PersonData.json";
+        string _jsonPersons = String.Empty;
+        public string Error { get; set; }
+        public ObservableCollection<Person> LoadPerson()
+        {
+            _jsonPersons = File.ReadAllText(path); if (_jsonPersons != null)
+            {
+                ListPerson = JsonConvert.DeserializeObject < ObservableCollection < Person >> (_jsonPersons);
+                return ListPerson;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        private void SaveChanges(ObservableCollection<Person> listPerson)
+        {
+            var jsonPerson = JsonConvert.SerializeObject(listPerson);
+            try
+            {
+                using (StreamWriter writer = File.CreateText(path))
+                {
+                    writer.Write(jsonPerson);
+                }
+            }
+            catch (IOException e)
+            {
+                Error = "Ошибка записи json файла\n" + e.Message;
+            }
+        }
+
         public ObservableCollection<Role> Roles => RoleViewModel.Instance.ListRole;
         public PersonDpo Person { get; }
         public ICommand SaveCommand { get; }
+        public ObservableCollection<Person> ListPerson { get; set; }
+        public ObservableCollection<PersonDpo> ListPersonDpo { get; set; }
+
+        public string Message { get; set; }
+
 
         public PersonEditContext(PersonDpo person, Action saveAction)
         {
@@ -94,14 +138,9 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
         public ObservableCollection<Person> ListPerson { get; set; } = new ObservableCollection<Person>();
         public ObservableCollection<PersonDpo> ListPersonDpo { get; set; } = new ObservableCollection<PersonDpo>();
 
-        public PersonViewModel()
-        {
-            ListPerson.Add(new Person { Id = 1, RoleId = 1, FirstName = "Иван", LastName = "Иванов", Birthday = new DateTime(1980, 2, 28) });
-            ListPerson.Add(new Person { Id = 2, RoleId = 2, FirstName = "Петр", LastName = "Петров", Birthday = new DateTime(1981, 3, 20) });
-            ListPerson.Add(new Person { Id = 3, RoleId = 3, FirstName = "Виктор", LastName = "Викторов", Birthday = new DateTime(1982, 4, 15) });
-            ListPerson.Add(new Person { Id = 4, RoleId = 3, FirstName = "Сидор", LastName = "Сидоров", Birthday = new DateTime(1983, 5, 10) });
-            RefreshListPersonDpo();
-        }
+
+
+
 
         private void RefreshListPersonDpo()
         {
@@ -209,5 +248,6 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = "") =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
     }
 }
