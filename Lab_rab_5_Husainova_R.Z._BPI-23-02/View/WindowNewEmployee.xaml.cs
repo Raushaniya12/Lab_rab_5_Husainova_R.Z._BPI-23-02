@@ -1,6 +1,5 @@
 ﻿using Lab_rab_5_Husainova_R.Z._BPI_23_02.Model;
 using Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel;
-using Lab_rab_5_Husainova_R.Z._BPI_23_02.Model;
 using System;
 using System.Linq;
 using System.Windows;

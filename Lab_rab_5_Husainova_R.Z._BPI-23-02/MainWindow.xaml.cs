@@ -1,6 +1,4 @@
-﻿
-using Lab_rab_5_Husainova_R.Z._BPI_23_02.View;
-using Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel;
+﻿using Lab_rab_5_Husainova_R.Z._BPI_23_02.View;
 using Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel;
 using System;
 using System.Collections.Generic;

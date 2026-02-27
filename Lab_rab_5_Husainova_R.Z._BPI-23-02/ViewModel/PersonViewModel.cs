@@ -1,8 +1,6 @@
 ﻿using Lab_rab_5_Husainova_R.Z._BPI_23_02.Helper;
 using Lab_rab_5_Husainova_R.Z._BPI_23_02.Model;
 using Lab_rab_5_Husainova_R.Z._BPI_23_02.View;
-using Lab_rab_5_Husainova_R.Z._BPI_23_02.Helper;
-using Lab_rab_5_Husainova_R.Z._BPI_23_02.Model;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
