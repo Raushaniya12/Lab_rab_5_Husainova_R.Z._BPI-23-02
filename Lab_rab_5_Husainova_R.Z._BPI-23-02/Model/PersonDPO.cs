@@ -44,8 +44,8 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.Model
                 OnPropertyChanged("LastName");
             }
         }
-        private DateTime birthday;
-        public DateTime Birthday
+        private string birthday;
+        public string Birthday
         {
             get { return birthday; }
             set
@@ -55,7 +55,7 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.Model
             }
         }
         public PersonDpo() { }
-        public PersonDpo(int id, string roleName, string firstName, string lastName, DateTime birthday)
+        public PersonDpo(int id, string roleName, string firstName, string lastName, string birthday)
         {
             this.Id = id;
             this.RoleName = roleName;

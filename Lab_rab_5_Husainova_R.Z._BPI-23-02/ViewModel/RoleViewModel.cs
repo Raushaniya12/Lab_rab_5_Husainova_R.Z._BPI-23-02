@@ -3,28 +3,23 @@ using Lab_rab_5_Husainova_R.Z._BPI_23_02.Model;
 using Lab_rab_5_Husainova_R.Z._BPI_23_02.View;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Shapes;
 
 namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
 {
-
     public class RoleEditContext : INotifyPropertyChanged
     {
         public string Error { get; set; }
+
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = "") =>
           PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        readonly string path = @"DataModels\RoleData.json";
-       
+
         private Role selectedRole;
         public Role SelectedRole
         {
@@ -35,18 +30,8 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
                 OnPropertyChanged();
             }
         }
-        
-        private void RefreshRoleList()
-        {
-            OnPropertyChanged("ListRole");
-            var tempList = new ObservableCollection<Role>(ListRole);
-            ListRole.Clear();
-            foreach (var item in tempList)
-            {
-                ListRole.Add(item);
-            }
-        }
-        public int MaxId() => ListRole.Count == 0 ? 0 : ListRole.Max(r => r.Id);
+
+        public int MaxId() => RoleViewModel.Instance.ListRole.Count == 0 ? 0 : RoleViewModel.Instance.ListRole.Max(r => r.Id);
 
         private RelayCommand addRole;
         public RelayCommand AddRole => addRole = new RelayCommand(_ =>
@@ -64,7 +49,8 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
 
             if (wnRole.ShowDialog() == true)
             {
-                ListRole.Add(role);
+                RoleViewModel.Instance.ListRole.Add(role);
+                RoleViewModel.Instance.SaveChanges(RoleViewModel.Instance.ListRole);
                 SelectedRole = role;
             }
         });
@@ -86,6 +72,7 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
             if (wnRole.ShowDialog() == true)
             {
                 SelectedRole.NameRole = tempRole.NameRole;
+                RoleViewModel.Instance.SaveChanges(RoleViewModel.Instance.ListRole);
             }
         }, _ => SelectedRole != null);
 
@@ -100,44 +87,12 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
 
             if (result == MessageBoxResult.OK)
             {
-                ListRole.Remove(role);
+                RoleViewModel.Instance.ListRole.Remove(role);
+                RoleViewModel.Instance.SaveChanges(RoleViewModel.Instance.ListRole);
                 SelectedRole = null;
             }
         }, _ => SelectedRole != null);
 
-        string _jsonRoles = String.Empty;
-        public ObservableCollection<Role> ListRole { get; set; } = new ObservableCollection<Role>();
-        public ObservableCollection<Role> LoadRole()
-        {
-            _jsonRoles = File.ReadAllText(path);
-
-            if (_jsonRoles != null)
-            {
-                ListRole = JsonConvert.DeserializeObject<ObservableCollection<Role>>(_jsonRoles);
-                return ListRole;
-            }
-            else
-            {
-                return null;
-            }
-        }
-        
-        private void SaveChanges(ObservableCollection<Role> listRole)
-        {
-            var jsonRole = JsonConvert.SerializeObject(listRole);
-
-            try
-            {
-                using (StreamWriter writer = File.CreateText(path))
-                {
-                    writer.Write(jsonRole);
-                }
-            }
-            catch (IOException e)
-            {
-                Error = "Ошибка записи json файла\n" + e.Message;
-            }
-        }
         public Role Role { get; }
         public ICommand SaveCommand { get; }
 
@@ -160,9 +115,7 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-        
     }
-    
 
     public class RoleViewModel : INotifyPropertyChanged
     {
@@ -179,17 +132,30 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
             }
         }
 
-        
+        readonly string path = @"DataModels\RoleData.json";
+        string _jsonRoles = String.Empty;
+        public string Error { get; set; }
 
         public ObservableCollection<Role> ListRole { get; set; } = new ObservableCollection<Role>();
 
-        
-        
+        private Role _selectedRole;
+        public Role SelectedRole
+        {
+            get => _selectedRole;
+            set
+            {
+                _selectedRole = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public RoleViewModel()
+        {
+            ListRole = LoadRole();
+        }
 
         public string GetRoleNameById(int id) => ListRole.FirstOrDefault(r => r.Id == id)?.NameRole ?? string.Empty;
         public int GetRoleIdByName(string name) => ListRole.FirstOrDefault(r => r.NameRole == name)?.Id ?? 0;
-
-        
 
         private static RelayCommand switchLightTheme;
         public static RelayCommand SwitchLightTheme => switchLightTheme = new RelayCommand(_ => ThemeManager.ApplyTheme("LightTheme"));
@@ -198,6 +164,59 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
         public static RelayCommand SwitchDarkTheme => switchDarkTheme = new RelayCommand(_ => ThemeManager.ApplyTheme("DarkTheme"));
 
         public event PropertyChangedEventHandler PropertyChanged;
-        
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = "") =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+        public ObservableCollection<Role> LoadRole()
+        {
+            try
+            {
+                if (File.Exists(path))
+                {
+                    _jsonRoles = File.ReadAllText(path);
+                    if (_jsonRoles != null)
+                    {
+                        ListRole = JsonConvert.DeserializeObject<ObservableCollection<Role>>(_jsonRoles);
+                        return ListRole ?? new ObservableCollection<Role>();
+                    }
+                }
+                return new ObservableCollection<Role>();
+            }
+            catch (Exception ex)
+            {
+                Error = $"Ошибка чтения JSON-файла: {ex.Message}";
+                return new ObservableCollection<Role>();
+            }
+        }
+
+        public int MaxId()
+        {
+            int max = 0;
+            foreach (var r in this.ListRole)
+            {
+                if (max < r.Id)
+                {
+                    max = r.Id;
+                }
+            }
+            return max;
+        }
+
+        public void SaveChanges(ObservableCollection<Role> listRole)
+        {
+            var jsonRole = JsonConvert.SerializeObject(listRole);
+            try
+            {
+                using (StreamWriter writer = File.CreateText(path))
+                {
+                    writer.Write(jsonRole);
+                }
+            }
+            catch (IOException e)
+            {
+                Error = "Ошибка записи json файла\n" + e.Message;
+            }
+        }
     }
 }

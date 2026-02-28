@@ -20,37 +20,7 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
 {
     public class PersonEditContext : INotifyPropertyChanged
     {
-        readonly string path = @"DataModels\PersonData.json";
-        string _jsonPersons = String.Empty;
-        public string Error { get; set; }
-        public ObservableCollection<Person> LoadPerson()
-        {
-            _jsonPersons = File.ReadAllText(path); if (_jsonPersons != null)
-            {
-                ListPerson = JsonConvert.DeserializeObject < ObservableCollection < Person >> (_jsonPersons);
-                return ListPerson;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        private void SaveChanges(ObservableCollection<Person> listPerson)
-        {
-            var jsonPerson = JsonConvert.SerializeObject(listPerson);
-            try
-            {
-                using (StreamWriter writer = File.CreateText(path))
-                {
-                    writer.Write(jsonPerson);
-                }
-            }
-            catch (IOException e)
-            {
-                Error = "Ошибка записи json файла\n" + e.Message;
-            }
-        }
+        
 
         public ObservableCollection<Role> Roles => RoleViewModel.Instance.ListRole;
         public PersonDpo Person { get; }
@@ -96,7 +66,7 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
             set => Person.LastName = value;
         }
 
-        public DateTime Birthday
+        public string Birthday
         {
             get => Person.Birthday;
             set => Person.Birthday = value;
@@ -123,6 +93,37 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
                 return _instance;
             }
         }
+        readonly string path = @"DataModels\PersonData.json";
+        string _jsonPersons = String.Empty;
+        public string Error { get; set; }
+        public ObservableCollection<Person> LoadPerson()
+        {
+            _jsonPersons = File.ReadAllText(path); if (_jsonPersons != null)
+            {
+                ListPerson = JsonConvert.DeserializeObject<ObservableCollection<Person>>(_jsonPersons);
+                return ListPerson;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        private void SaveChanges(ObservableCollection<Person> listPerson)
+        {
+            var jsonPerson = JsonConvert.SerializeObject(listPerson);
+            try
+            {
+                using (StreamWriter writer = File.CreateText(path))
+                {
+                    writer.Write(jsonPerson);
+                }
+            }
+            catch (IOException e)
+            {
+                Error = "Ошибка записи json файла\n" + e.Message;
+            }
+        }
 
         private PersonDpo selectedPersonDpo;
         public PersonDpo SelectedPersonDpo
@@ -138,7 +139,16 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
         public ObservableCollection<Person> ListPerson { get; set; } = new ObservableCollection<Person>();
         public ObservableCollection<PersonDpo> ListPersonDpo { get; set; } = new ObservableCollection<PersonDpo>();
 
-
+        public PersonViewModel()
+        {
+            ListPerson = new ObservableCollection<Person>();
+            ListPersonDpo = new ObservableCollection<PersonDpo>();
+            ListPerson = LoadPerson(); 
+            if (ListPerson != null)
+            {
+                RefreshListPersonDpo();  
+            }
+        }
 
 
 
@@ -160,7 +170,7 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
             var personDpo = new PersonDpo
             {
                 Id = MaxId() + 1,
-                Birthday = DateTime.Now
+                
             };
 
             var context = new PersonEditContext(personDpo, () =>
@@ -175,6 +185,7 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
             {
                 ListPersonDpo.Add(personDpo);
                 ListPerson.Add(new Person().CopyFromPersonDPO(personDpo));
+                SaveChanges(ListPerson);
             }
         });
 
@@ -203,6 +214,7 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
                 if (existingPerson != null)
                 {
                     existingPerson.CopyFromPersonDPO(SelectedPersonDpo);
+                    SaveChanges(ListPerson);
                 }
             }
         }, _ => SelectedPersonDpo != null);
@@ -224,6 +236,7 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
                     ListPerson.Remove(person);
 
                 SelectedPersonDpo = null;
+                SaveChanges(ListPerson);
             }
         }, _ => SelectedPersonDpo != null);
 
