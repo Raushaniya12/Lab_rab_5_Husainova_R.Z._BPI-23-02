@@ -136,7 +136,16 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
         string _jsonRoles = String.Empty;
         public string Error { get; set; }
 
-        public ObservableCollection<Role> ListRole { get; set; } = new ObservableCollection<Role>();
+        private ObservableCollection<Role> _listRole;
+        public ObservableCollection<Role> ListRole
+        {
+            get => _listRole;
+            set
+            {
+                _listRole = value;
+                OnPropertyChanged();
+            }
+        }
 
         private Role _selectedRole;
         public Role SelectedRole
@@ -154,8 +163,8 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
             ListRole = LoadRole();
         }
 
-        public string GetRoleNameById(int id) => ListRole.FirstOrDefault(r => r.Id == id)?.NameRole ?? string.Empty;
-        public int GetRoleIdByName(string name) => ListRole.FirstOrDefault(r => r.NameRole == name)?.Id ?? 0;
+        public string GetRoleNameById(int id) => ListRole?.FirstOrDefault(r => r.Id == id)?.NameRole ?? string.Empty;
+        public int GetRoleIdByName(string name) => ListRole?.FirstOrDefault(r => r.NameRole == name)?.Id ?? 0;
 
         private static RelayCommand switchLightTheme;
         public static RelayCommand SwitchLightTheme => switchLightTheme = new RelayCommand(_ => ThemeManager.ApplyTheme("LightTheme"));
@@ -175,10 +184,10 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
                 if (File.Exists(path))
                 {
                     _jsonRoles = File.ReadAllText(path);
-                    if (_jsonRoles != null)
+                    if (!string.IsNullOrEmpty(_jsonRoles))
                     {
-                        ListRole = JsonConvert.DeserializeObject<ObservableCollection<Role>>(_jsonRoles);
-                        return ListRole ?? new ObservableCollection<Role>();
+                        var result = JsonConvert.DeserializeObject<ObservableCollection<Role>>(_jsonRoles);
+                        return result ?? new ObservableCollection<Role>();
                     }
                 }
                 return new ObservableCollection<Role>();
@@ -193,11 +202,14 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
         public int MaxId()
         {
             int max = 0;
-            foreach (var r in this.ListRole)
+            if (ListRole != null)
             {
-                if (max < r.Id)
+                foreach (var r in ListRole)
                 {
-                    max = r.Id;
+                    if (max < r.Id)
+                    {
+                        max = r.Id;
+                    }
                 }
             }
             return max;
