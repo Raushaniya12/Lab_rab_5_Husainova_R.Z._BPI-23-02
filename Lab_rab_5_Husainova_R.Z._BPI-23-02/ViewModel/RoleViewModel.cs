@@ -30,68 +30,8 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
                 OnPropertyChanged();
             }
         }
+        
 
-        public int MaxId() => RoleViewModel.Instance.ListRole.Count == 0 ? 0 : RoleViewModel.Instance.ListRole.Max(r => r.Id);
-
-        private RelayCommand addRole;
-        public RelayCommand AddRole => addRole = new RelayCommand(_ =>
-        {
-            var wnRole = new WindowNewRole { Title = "Новая должность" };
-            var role = new Role { Id = MaxId() + 1 };
-
-            var context = new RoleEditContext(role, () =>
-            {
-                wnRole.DialogResult = true;
-                wnRole.Close();
-            });
-
-            wnRole.DataContext = context;
-
-            if (wnRole.ShowDialog() == true)
-            {
-                RoleViewModel.Instance.ListRole.Add(role);
-                RoleViewModel.Instance.SaveChanges(RoleViewModel.Instance.ListRole);
-                SelectedRole = role;
-            }
-        });
-
-        private RelayCommand editRole;
-        public RelayCommand EditRole => editRole = new RelayCommand(_ =>
-        {
-            var wnRole = new WindowNewRole { Title = "Редактирование должности" };
-            var tempRole = SelectedRole.ShallowCopy();
-
-            var context = new RoleEditContext(tempRole, () =>
-            {
-                wnRole.DialogResult = true;
-                wnRole.Close();
-            });
-
-            wnRole.DataContext = context;
-
-            if (wnRole.ShowDialog() == true)
-            {
-                SelectedRole.NameRole = tempRole.NameRole;
-                RoleViewModel.Instance.SaveChanges(RoleViewModel.Instance.ListRole);
-            }
-        }, _ => SelectedRole != null);
-
-        private RelayCommand deleteRole;
-        public RelayCommand DeleteRole => deleteRole = new RelayCommand(_ =>
-        {
-            var role = SelectedRole;
-            if (role == null) return;
-
-            var result = MessageBox.Show($"Удалить должность: {role.NameRole}?", "Подтверждение",
-                MessageBoxButton.OKCancel, MessageBoxImage.Question);
-
-            if (result == MessageBoxResult.OK)
-            {
-                RoleViewModel.Instance.ListRole.Remove(role);
-                RoleViewModel.Instance.SaveChanges(RoleViewModel.Instance.ListRole);
-                SelectedRole = null;
-            }
-        }, _ => SelectedRole != null);
 
         public Role Role { get; }
         public ICommand SaveCommand { get; }
@@ -131,8 +71,7 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
                 return _instance;
             }
         }
-
-        readonly string path = @"DataModels\RoleData.json";
+        readonly string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DataModel", "RoleData.json");
         string _jsonRoles = String.Empty;
         public string Error { get; set; }
 
@@ -160,6 +99,7 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
 
         public RoleViewModel()
         {
+            _listRole = new ObservableCollection<Role>();
             ListRole = LoadRole();
         }
 
@@ -199,22 +139,7 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
             }
         }
 
-        public int MaxId()
-        {
-            int max = 0;
-            if (ListRole != null)
-            {
-                foreach (var r in ListRole)
-                {
-                    if (max < r.Id)
-                    {
-                        max = r.Id;
-                    }
-                }
-            }
-            return max;
-        }
-
+        
         public void SaveChanges(ObservableCollection<Role> listRole)
         {
             var jsonRole = JsonConvert.SerializeObject(listRole);
@@ -230,5 +155,62 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
                 Error = "Ошибка записи json файла\n" + e.Message;
             }
         }
+
+        public int MaxId() => RoleViewModel.Instance.ListRole.Count == 0 ? 0 : RoleViewModel.Instance.ListRole.Max(r => r.Id);
+
+        private RelayCommand addRole;
+        public RelayCommand AddRole => addRole = new RelayCommand(_ =>
+        {
+            var wnRole = new WindowNewRole { Title = "Новая должность" };
+
+            int maxIdRole = MaxId() + 1;
+            Role role = new Role { Id = maxIdRole };
+
+            wnRole.DataContext = role;
+
+            if (wnRole.ShowDialog() == true)
+            {
+                ListRole.Add(role);
+                SaveChanges(ListRole);
+                SelectedRole = role;
+            }
+        });
+
+
+        private RelayCommand editRole;
+        public RelayCommand EditRole => editRole = new RelayCommand(_ =>
+        {
+            var wnRole = new WindowNewRole { Title = "Редактирование должности" };
+
+            Role role = SelectedRole;
+            var tempRole = role.ShallowCopy();
+
+            wnRole.DataContext = tempRole;
+
+            if (wnRole.ShowDialog() == true)
+            {
+                role.NameRole = tempRole.NameRole;
+                SaveChanges(ListRole);
+            }
+        }, _ => SelectedRole != null);
+
+
+        private RelayCommand deleteRole;
+        public RelayCommand DeleteRole => deleteRole = new RelayCommand(_ =>
+        {
+            var role = SelectedRole;
+            if (role == null) return;
+
+            var result = MessageBox.Show($"Удалить должность: {role.NameRole}?", "Предупреждение",
+                MessageBoxButton.OKCancel, MessageBoxImage.Warning);
+
+            if (result == MessageBoxResult.OK)
+            {
+                ListRole.Remove(role);
+                SaveChanges(ListRole);
+                SelectedRole = null;
+            }
+        }, _ => SelectedRole != null);
+
     }
 }

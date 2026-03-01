@@ -14,7 +14,7 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.View
         public WindowEmployee()
         {
             InitializeComponent();
-            //DataContext = PersonViewModel.Instance;
+            DataContext = PersonViewModel.Instance;
         }
     }
 }

@@ -13,7 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Shapes;
+
 
 
 namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
@@ -93,7 +93,8 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
                 return _instance;
             }
         }
-        readonly string path = @"DataModels\PersonData.json";
+
+        readonly string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DataModel", "PersonData.json");
         string _jsonPersons = String.Empty;
         public string Error { get; set; }
         public ObservableCollection<Person> LoadPerson()

@@ -71,7 +71,8 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.Model
         {
             PersonDpo perDpo = new PersonDpo();
             RoleViewModel vmRole = RoleViewModel.Instance;
-            string role = string.Empty;
+            string role = "Не определено";
+
             foreach (var r in vmRole.ListRole)
             {
                 if (r.Id == person.RoleId)
@@ -80,14 +81,13 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.Model
                     break;
                 }
             }
-            if (role != string.Empty)
-            {
-                perDpo.Id = person.Id;
-                perDpo.RoleName = role;
-                perDpo.FirstName = person.FirstName;
-                perDpo.LastName = person.LastName;
-                perDpo.Birthday = person.Birthday;
-            }
+
+            perDpo.Id = person.Id;
+            perDpo.RoleName = role;
+            perDpo.FirstName = person.FirstName;
+            perDpo.LastName = person.LastName;
+            perDpo.Birthday = person.Birthday;
+
             return perDpo;
         }
 

@@ -46,7 +46,7 @@
                  Text="{Binding FirstName}" VerticalAlignment="Center"/>
         <Label Grid.Row="5" Grid.Column="0" Content="Дата рождения:" VerticalAlignment="Center"/>
         <DatePicker Grid.Row="5" Grid.Column="1" 
-                    SelectedDate="{Binding Birthday}" VerticalAlignment="Center"/>
+                    SelectedDate="{Binding Birthday, StringFormat={}{0:dd.MM.yyyy}}" VerticalAlignment="Center"/>
 
         <StackPanel Grid.Row="7" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Content="Сохранить" Width="80" Height="25" Margin="0,0,10,0"
