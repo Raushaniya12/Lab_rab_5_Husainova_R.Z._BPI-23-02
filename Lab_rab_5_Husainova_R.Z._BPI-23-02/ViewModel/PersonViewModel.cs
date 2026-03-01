@@ -89,8 +89,11 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
             }
         }
 
-
-        readonly string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DataModel", "PersonData.json");
+        readonly string path = Path.Combine(
+                    Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory)?.Parent?.Parent?.FullName ?? "",
+                    "DataModel",
+                    "PersonData.json"
+                );
         string _jsonPersons = String.Empty;
         public string Error { get; set; }
 
