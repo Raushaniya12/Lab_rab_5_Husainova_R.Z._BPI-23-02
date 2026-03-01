@@ -148,13 +148,17 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
             }
         }
 
-        
+
         public void SaveChanges(ObservableCollection<Role> listRole)
         {
             var jsonRole = JsonConvert.SerializeObject(listRole);
             try
             {
-             
+                string directory = Path.GetDirectoryName(path);
+                if (!Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
                 using (StreamWriter writer = File.CreateText(path))
                 {
                     writer.Write(jsonRole);

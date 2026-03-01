@@ -14,14 +14,10 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
-
-
 namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
 {
     public class PersonEditContext : INotifyPropertyChanged
     {
-        
-
         public ObservableCollection<Role> Roles => RoleViewModel.Instance.ListRole;
         public PersonDpo Person { get; }
         public ICommand SaveCommand { get; }
@@ -29,7 +25,6 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
         public ObservableCollection<PersonDpo> ListPersonDpo { get; set; }
 
         public string Message { get; set; }
-
 
         public PersonEditContext(PersonDpo person, Action saveAction)
         {
@@ -94,19 +89,30 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
             }
         }
 
+
         readonly string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DataModel", "PersonData.json");
         string _jsonPersons = String.Empty;
         public string Error { get; set; }
+
         public ObservableCollection<Person> LoadPerson()
         {
-            _jsonPersons = File.ReadAllText(path); if (_jsonPersons != null)
+            try
             {
-                ListPerson = JsonConvert.DeserializeObject<ObservableCollection<Person>>(_jsonPersons);
-                return ListPerson;
+                if (File.Exists(path))
+                {
+                    _jsonPersons = File.ReadAllText(path);
+                    if (!string.IsNullOrEmpty(_jsonPersons))
+                    {
+                        var result = JsonConvert.DeserializeObject<ObservableCollection<Person>>(_jsonPersons);
+                        return result ?? new ObservableCollection<Person>();
+                    }
+                }
+                return new ObservableCollection<Person>();
             }
-            else
+            catch (Exception ex)
             {
-                return null;
+                Error = $"Ошибка чтения JSON-файла: {ex.Message}";
+                return new ObservableCollection<Person>();
             }
         }
 
@@ -115,10 +121,17 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
             var jsonPerson = JsonConvert.SerializeObject(listPerson);
             try
             {
+                string directory = Path.GetDirectoryName(path);
+                if (!Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+
                 using (StreamWriter writer = File.CreateText(path))
                 {
                     writer.Write(jsonPerson);
                 }
+                Error = null;
             }
             catch (IOException e)
             {
@@ -144,14 +157,12 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
         {
             ListPerson = new ObservableCollection<Person>();
             ListPersonDpo = new ObservableCollection<PersonDpo>();
-            ListPerson = LoadPerson(); 
+            ListPerson = LoadPerson();
             if (ListPerson != null)
             {
-                RefreshListPersonDpo();  
+                RefreshListPersonDpo();
             }
         }
-
-
 
         private void RefreshListPersonDpo()
         {
@@ -171,7 +182,6 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
             var personDpo = new PersonDpo
             {
                 Id = MaxId() + 1,
-                
             };
 
             var context = new PersonEditContext(personDpo, () =>
@@ -262,6 +272,5 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = "") =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
     }
 }
