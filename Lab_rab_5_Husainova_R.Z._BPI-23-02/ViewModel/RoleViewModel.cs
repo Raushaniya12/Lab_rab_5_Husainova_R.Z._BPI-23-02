@@ -16,7 +16,8 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
     public class RoleEditContext : INotifyPropertyChanged
     {
         public string Error { get; set; }
-
+        public Role Role { get; }
+        public ICommand SaveCommand { get; }
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = "") =>
           PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
@@ -33,8 +34,7 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
         
 
 
-        public Role Role { get; }
-        public ICommand SaveCommand { get; }
+        
 
         public RoleEditContext(Role role, Action saveAction)
         {
@@ -42,16 +42,25 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
             SaveCommand = new RelayCommand(_ => saveAction(), _ => !string.IsNullOrWhiteSpace(role.NameRole?.Trim()));
         }
 
+
         public int Id
         {
             get => Role.Id;
-            set => Role.Id = value;
+            set
+            {
+                Role.Id = value;
+                
+            }
         }
 
         public string NameRole
         {
             get => Role.NameRole;
-            set => Role.NameRole = value;
+            set
+            {
+                Role.NameRole = value;
+                OnPropertyChanged(); 
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -145,10 +154,12 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
             var jsonRole = JsonConvert.SerializeObject(listRole);
             try
             {
+             
                 using (StreamWriter writer = File.CreateText(path))
                 {
                     writer.Write(jsonRole);
                 }
+                Error = null;
             }
             catch (IOException e)
             {
@@ -165,8 +176,8 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
 
             int maxIdRole = MaxId() + 1;
             Role role = new Role { Id = maxIdRole };
-
-            wnRole.DataContext = role;
+            var context = new RoleEditContext(role, () => wnRole.DialogResult = true);
+            wnRole.DataContext = context;
 
             if (wnRole.ShowDialog() == true)
             {
@@ -184,8 +195,8 @@ namespace Lab_rab_5_Husainova_R.Z._BPI_23_02.ViewModel
 
             Role role = SelectedRole;
             var tempRole = role.ShallowCopy();
-
-            wnRole.DataContext = tempRole;
+            var context = new RoleEditContext(tempRole, () => wnRole.DialogResult = true);
+            wnRole.DataContext = context;
 
             if (wnRole.ShowDialog() == true)
             {
